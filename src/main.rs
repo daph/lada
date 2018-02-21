@@ -37,7 +37,7 @@ impl slack::EventHandler for LadaClient {
                         if !text.is_empty() {
                             match OpenOptions::new().append(true).open(SEED_FILE).as_mut() {
                                 Ok(f) => {
-                                    writeln!(f, "{}\n", &text.trim()).unwrap_or_else(|e| {
+                                    writeln!(f, "{}", &text.trim()).unwrap_or_else(|e| {
                                         eprintln!("Couldn't appened to seed file: {:?}", e);
                                     });
                                 },
