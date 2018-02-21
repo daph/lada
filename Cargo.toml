@@ -1,0 +1,17 @@
+[package]
+name = "lada"
+version = "0.1.0"
+authors = ["David Phillips <david@daviddouglasphillips.com>"]
+
+[dependencies]
+rand = "0.4"
+slack = "0.19.0"
+
+[profile.release]
+opt-level = 2
+debug = false
+rpath = false
+lto = true
+debug-assertions = false
+codegen-units = 1
+panic = 'abort'
