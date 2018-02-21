@@ -4,10 +4,12 @@ extern crate slack;
 use lada::Brain;
 use slack::{Event, RtmClient};
 use slack::api as slack_api;
-use std::fs::File;
+use std::fs::{File, OpenOptions};
 use std::process;
 use std::env;
 use std::io::prelude::*;
+
+static SEED_FILE: &'static str = "corpus.txt";
 
 struct LadaClient {
     name: String,
@@ -30,6 +32,15 @@ impl slack::EventHandler for LadaClient {
                         let text = text.replace(&self.id, "").replace(&self.name, "");
                         for s in get_sentances(&text) {
                             self.brain.learn(s);
+                        }
+
+                        match OpenOptions::new().append(true).open(SEED_FILE).as_mut() {
+                            Ok(f) => {
+                                writeln!(f, "{}", &text).unwrap_or_else(|e| {
+                                    eprintln!("Couldn't appened to seed file: {:?}", e);
+                                });
+                            },
+                            Err(e) => eprintln!("Couldn't open seed file as appened {:?}", e)
                         }
                     }
                 },
@@ -62,7 +73,7 @@ fn main() {
 
     let mut brain = Brain::new();
 
-    let mut f = File::open("totse.txt").expect("File not found");
+    let mut f = File::open(SEED_FILE).expect("File not found");
     let mut contents = String::new();
     f.read_to_string(&mut contents).expect("derp");
 
