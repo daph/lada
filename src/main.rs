@@ -34,13 +34,15 @@ impl slack::EventHandler for LadaClient {
                             self.brain.learn(s);
                         }
 
-                        match OpenOptions::new().append(true).open(SEED_FILE).as_mut() {
-                            Ok(f) => {
-                                writeln!(f, "{}", &text).unwrap_or_else(|e| {
-                                    eprintln!("Couldn't appened to seed file: {:?}", e);
-                                });
-                            },
-                            Err(e) => eprintln!("Couldn't open seed file as appened {:?}", e)
+                        if !text.is_empty() {
+                            match OpenOptions::new().append(true).open(SEED_FILE).as_mut() {
+                                Ok(f) => {
+                                    writeln!(f, "{}", &text).unwrap_or_else(|e| {
+                                        eprintln!("Couldn't appened to seed file: {:?}", e);
+                                    });
+                                },
+                                Err(e) => eprintln!("Couldn't open seed file as appened {:?}", e)
+                            }
                         }
                     }
                 },
