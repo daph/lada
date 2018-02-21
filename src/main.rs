@@ -7,7 +7,8 @@ use slack::api as slack_api;
 use std::fs::{File, OpenOptions};
 use std::process;
 use std::env;
-use std::time::Instant;
+use std::time::{Duration, Instant};
+use std::thread;
 use std::io::prelude::*;
 
 static SEED_FILE: &'static str = "corpus.txt";
@@ -93,10 +94,21 @@ fn main() {
 
     let mut client = LadaClient { name: "".to_owned(), id: "".to_owned(), brain: brain };
 
-    let r = RtmClient::login_and_run(&api_key, &mut client);
-    match r {
-        Ok(_) => {}
-        Err(err) => panic!("Error: {}", err),
+    let mut retries = 3;
+    loop {
+        let r = RtmClient::login_and_run(&api_key, &mut client);
+        match r {
+            Ok(_) => {},
+            Err(err) => {
+                if retries <= 0 {
+                    panic!("No more retries left!")
+                }
+                eprintln!("Slack error: {:?}", err);
+                retries -= 1;
+                thread::sleep(Duration::from_millis(2000));
+                eprintln!("Retrying... (retries left: {})", retries);
+            },
+        }
     }
 }
 
