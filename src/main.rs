@@ -20,8 +20,8 @@ impl slack::EventHandler for LadaClient {
         if let Event::Message(msg) = event {
             match *msg {
                 slack_api::Message::Standard(my_msg) => {
-                    let user = my_msg.user.unwrap_or("".to_owned());
-                    let text = my_msg.text.unwrap_or("".to_owned());
+                    let user = my_msg.user.unwrap_or("".to_owned()).to_lowercase();
+                    let text = my_msg.text.unwrap_or("".to_owned()).to_lowercase();
                     let channel = my_msg.channel.unwrap_or("".to_owned());
 
                     if user != self.id && text.contains(&self.name) || text.contains(&self.id) {
@@ -47,8 +47,8 @@ impl slack::EventHandler for LadaClient {
     fn on_connect(&mut self, cli: &RtmClient) {
         if let Some(slf) = cli.start_response().slf.as_ref() {
             let slf = slf.clone();
-            self.name = slf.name.expect("No username found in start response!");
-            self.id = slf.id.expect("No user id found in start response!");
+            self.name = slf.name.expect("No username found in start response!").to_lowercase();
+            self.id = slf.id.expect("No user id found in start response!").to_lowercase();
         }
     }
 }
