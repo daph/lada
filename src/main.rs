@@ -76,6 +76,7 @@ fn main() {
     let mut f = File::open(SEED_FILE).expect("File not found");
     let mut contents = String::new();
     f.read_to_string(&mut contents).expect("derp");
+    drop(f);
 
     for s in get_sentances(&contents) {
         brain.learn(s.trim());
