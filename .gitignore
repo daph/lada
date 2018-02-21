@@ -1,0 +1,3 @@
+*.txt
+/target/
+**/*.rs.bk

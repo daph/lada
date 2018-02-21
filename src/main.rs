@@ -26,6 +26,11 @@ impl slack::EventHandler for LadaClient {
 
                     if user != self.id && text.contains(&self.name) || text.contains(&self.id) {
                         let _ = cli.sender().send_message(&channel, &self.brain.to_string());
+
+                        let text = text.replace(&self.id, "").replace(&self.name, "");
+                        for s in get_sentances(&text) {
+                            self.brain.learn(s);
+                        }
                     }
                 },
 
@@ -61,7 +66,7 @@ fn main() {
     let mut contents = String::new();
     f.read_to_string(&mut contents).expect("derp");
 
-    for s in contents.split_terminator(|t| { t == '.' || t == '?' || t == '!' }) {
+    for s in get_sentances(&contents) {
         brain.learn(s.trim());
     }
 
@@ -72,4 +77,14 @@ fn main() {
         Ok(_) => {}
         Err(err) => panic!("Error: {}", err),
     }
+}
+
+fn get_sentances(contents: &str) -> Vec<&str> {
+    let mut sentances = Vec::new();
+
+    for s in contents.split_terminator(|t| { t == '.' || t == '?' || t == '!' }) {
+        sentances.push(s.trim());
+    }
+
+    sentances
 }
