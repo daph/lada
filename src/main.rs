@@ -7,6 +7,7 @@ use slack::api as slack_api;
 use std::fs::{File, OpenOptions};
 use std::process;
 use std::env;
+use std::time::Instant;
 use std::io::prelude::*;
 
 static SEED_FILE: &'static str = "corpus.txt";
@@ -76,6 +77,7 @@ fn main() {
 
     let mut brain = Brain::new();
 
+    let instant = Instant::now();
     let mut f = File::open(SEED_FILE).expect("File not found");
     let mut contents = String::new();
     f.read_to_string(&mut contents).expect("derp");
@@ -84,6 +86,10 @@ fn main() {
     for s in get_sentances(&contents) {
         brain.learn(s.trim());
     }
+
+    let duration  = instant.elapsed();
+    let elapsed_secs = duration.as_secs() as f64 + duration.subsec_nanos() as f64 * 1e-9;
+    eprintln!("Took {} seconds to load file and learn", elapsed_secs);
 
     let mut client = LadaClient { name: "".to_owned(), id: "".to_owned(), brain: brain };
 
