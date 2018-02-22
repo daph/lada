@@ -1,3 +1,5 @@
+[![travis](https://travis-ci.org/daph/lada.svg?branch=master)](https://travis-ci.org/daph/lada/)
+
 # lada
 A slack markov bot written in rust
 
