@@ -29,10 +29,10 @@ impl slack::EventHandler for LadaClient {
                     let channel = my_msg.channel.unwrap_or("".to_owned());
 
                     if user != self.id && text.contains(&self.name) || text.contains(&self.id) {
-                        let _ = cli.sender().send_message(&channel, &self.brain.to_string());
 
                         let clean_id = format!("<@{}>", self.id);
                         let text = text.replace(&clean_id, "").replace(&self.name, "");
+                        let _ = cli.sender().send_message(&channel, &self.brain.make_sentance(300, &text));
                         for s in get_sentances(&text) {
                             self.brain.learn(s);
                         }

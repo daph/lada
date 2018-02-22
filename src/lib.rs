@@ -3,7 +3,8 @@ extern crate rayon;
 
 use std::fmt;
 use std::collections::HashMap;
-use rand::{thread_rng, Rng};
+use rand::{thread_rng};
+use rand::distributions::{Sample, Range};
 use rayon::prelude::*;
 
 #[derive(Debug)]
@@ -26,31 +27,43 @@ impl Brain {
         while let Some((w1, w2)) = tuples.next() {
             let w1 = w1.to_owned();
             let w2 = w2.to_owned();
+            let words = self.brain_map.entry((w1, w2)).or_insert(vec![]);
             match tuples.peek() {
                 Some(&(_, w3)) => {
-                    let words = self.brain_map.entry((w1, w2)).or_insert(vec![]);
                     words.push(w3.to_owned());
                 }
                 None => {
-                    let w3 = vec!["<STOP>".to_owned()];
-                    self.brain_map.insert((w1, w2), w3);
+                    words.push("<STOP>".to_owned());
                 }
             }
         }
     }
 
-    fn make_sentance(&self, max_length: u32) -> String {
+    pub fn make_sentance(&self, max_length: u32, context: &str) -> String {
         let mut rng = thread_rng();
-        let starts = self.get_starts();
-        let pick = rng.gen_range(0, starts.len());
-        let mut word_tuple = starts[pick].clone();
-
         let mut sentance = String::new();
-        sentance.push_str(&word_tuple.1);
+        let mut word_tuple = match self.process_context(context) {
+            Some(ws) => {
+                sentance.push_str(&ws.0);
+                sentance.push_str(" ");
+                sentance.push_str(&ws.1);
+                ws
+            }
+            None => {
+                let starts = self.get_starts();
+                let mut range = Range::new(0, starts.len());
+                let pick = range.sample(&mut rng);
+                let ws = starts[pick].clone();
+                sentance.push_str(&ws.1);
+                ws
+            }
+        };
+
 
         for _ in 0..max_length {
             if let Some(next) = self.brain_map.get(&word_tuple) {
-                let pick = rng.gen_range(0, next.len());
+                let mut range = Range::new(0, next.len());
+                let pick = range.sample(&mut rng);
 
                 if next[pick].contains("<STOP>") {
                     break;
@@ -78,10 +91,24 @@ impl Brain {
                     None
                 }}).collect()
     }
+
+    fn process_context(&self, context: &str) -> Option<(String, String)> {
+        let seed = context.split_whitespace().take(2).collect::<Vec<&str>>();
+        if seed.len() > 1 {
+            let seed_tuple = (seed[0].to_owned(), seed[1].to_owned());
+            if self.brain_map.contains_key(&seed_tuple) {
+                Some(seed_tuple)
+            } else {
+                None
+            }
+        } else {
+            None
+        }
+    }
 }
 
 impl fmt::Display for Brain {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.make_sentance(300))
+        write!(f, "{}", self.make_sentance(300, ""))
     }
 }
