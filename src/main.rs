@@ -2,7 +2,7 @@ extern crate lada;
 extern crate slack;
 extern crate regex;
 
-use lada::Brain;
+use lada::brain::Brain;
 use slack::{Event, RtmClient};
 use slack::api as slack_api;
 use regex::Regex;
@@ -20,7 +20,7 @@ static BRAIN_DUMP: &'static str = "brain.dump";
 struct LadaClient {
     name: String,
     id: String,
-    brain: lada::Brain,
+    brain: Brain,
 }
 
 impl slack::EventHandler for LadaClient {
