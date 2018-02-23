@@ -39,8 +39,8 @@ impl slack::EventHandler for LadaClient {
                                     .send_message(&channel, &self.brain.make_sentance(300, ""));
                             }
                         } else {
-                                let _ = cli.sender()
-                                    .send_message(&channel, &self.brain.make_sentance(300, &text));
+                            let _ = cli.sender()
+                                .send_message(&channel, &self.brain.make_sentance(300, &text));
                             for s in get_sentances(&text) {
                                 self.brain.learn(s);
                             }
