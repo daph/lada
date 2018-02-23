@@ -1,13 +1,17 @@
 extern crate rand;
 extern crate rayon;
+extern crate bincode;
+#[macro_use] extern crate serde_derive;
 
 use std::fmt;
 use std::collections::HashMap;
+use std::fs::OpenOptions;
 use rand::{thread_rng};
 use rand::distributions::{Sample, Range};
 use rayon::prelude::*;
+use bincode::{serialize_into, deserialize_from};
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct Brain {
     brain_map: HashMap<(String, String), Vec<String>>
 }
@@ -79,6 +83,24 @@ impl Brain {
         }
 
         sentance
+    }
+
+    pub fn save(&self, file: &str) {
+        let mut f = OpenOptions::new()
+            .write(true)
+            .create(true)
+            .truncate(true)
+            .open(file)
+            .unwrap();
+        serialize_into(&mut f, &self.brain_map).unwrap();
+    }
+
+    pub fn load(&mut self, file: &str) {
+        let mut f = OpenOptions::new()
+            .read(true)
+            .open(file)
+            .unwrap();
+         self.brain_map = deserialize_from(&mut f).unwrap();
     }
 
     fn get_starts(&self) -> Vec<&(String, String)> {

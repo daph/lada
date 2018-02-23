@@ -5,6 +5,7 @@ use lada::Brain;
 use slack::{Event, RtmClient};
 use slack::api as slack_api;
 use std::fs::{File, OpenOptions};
+use std::path::Path;
 use std::process;
 use std::env;
 use std::time::{Duration, Instant};
@@ -12,6 +13,7 @@ use std::thread;
 use std::io::prelude::*;
 
 static SEED_FILE: &'static str = "corpus.txt";
+static BRAIN_DUMP: &'static str = "brain.dump";
 
 struct LadaClient {
     name: String,
@@ -36,6 +38,7 @@ impl slack::EventHandler for LadaClient {
                         for s in get_sentances(&text) {
                             self.brain.learn(s);
                         }
+                        self.brain.save(BRAIN_DUMP);
 
                         if !text.is_empty() {
                             match OpenOptions::new().append(true).open(SEED_FILE).as_mut() {
@@ -78,19 +81,25 @@ fn main() {
 
     let mut brain = Brain::new();
 
-    let instant = Instant::now();
-    let mut f = File::open(SEED_FILE).expect("File not found");
-    let mut contents = String::new();
-    f.read_to_string(&mut contents).expect("derp");
-    drop(f);
+    if Path::new(BRAIN_DUMP).exists() {
+        brain.load(BRAIN_DUMP);
+    } else {
+        let instant = Instant::now();
+        let mut contents = String::new();
+        {
+            let mut f = File::open(SEED_FILE).expect("File not found");
+            f.read_to_string(&mut contents).expect("derp");
+        }
 
-    for s in get_sentances(&contents) {
-        brain.learn(s.trim());
+        for s in get_sentances(&contents) {
+            brain.learn(s.trim());
+        }
+
+        let duration  = instant.elapsed();
+        let elapsed_secs = duration.as_secs() as f64 + duration.subsec_nanos() as f64 * 1e-9;
+        eprintln!("Took {} seconds to load file and learn", elapsed_secs);
+        brain.save(BRAIN_DUMP);
     }
-
-    let duration  = instant.elapsed();
-    let elapsed_secs = duration.as_secs() as f64 + duration.subsec_nanos() as f64 * 1e-9;
-    eprintln!("Took {} seconds to load file and learn", elapsed_secs);
 
     let mut client = LadaClient { name: "".to_owned(), id: "".to_owned(), brain: brain };
 
