@@ -31,23 +31,30 @@ impl slack::EventHandler for LadaClient {
                     let channel = my_msg.channel.unwrap_or("".to_owned());
 
                     if user != self.id && text.contains(&self.name) || text.contains(&self.id) {
-
                         let clean_id = format!("<@{}>", self.id);
                         let text = text.replace(&clean_id, "").replace(&self.name, "");
-                        let _ = cli.sender().send_message(&channel, &self.brain.make_sentance(300, &text));
-                        for s in get_sentances(&text) {
-                            self.brain.learn(s);
-                        }
-                        self.brain.save(BRAIN_DUMP);
+                        if text.contains("getget10") {
+                            for _ in 0..10{
+                                let _ = cli.sender()
+                                    .send_message(&channel, &self.brain.make_sentance(300, ""));
+                            }
+                        } else {
+                                let _ = cli.sender()
+                                    .send_message(&channel, &self.brain.make_sentance(300, &text));
+                            for s in get_sentances(&text) {
+                                self.brain.learn(s);
+                            }
+                            self.brain.save(BRAIN_DUMP);
 
-                        if !text.is_empty() {
-                            match OpenOptions::new().append(true).open(SEED_FILE).as_mut() {
-                                Ok(f) => {
-                                    writeln!(f, "{}", &text.trim()).unwrap_or_else(|e| {
-                                        eprintln!("Couldn't appened to seed file: {:?}", e);
-                                    });
-                                },
-                                Err(e) => eprintln!("Couldn't open seed file as appened {:?}", e)
+                            if !text.is_empty() {
+                                match OpenOptions::new().append(true).open(SEED_FILE).as_mut() {
+                                    Ok(f) => {
+                                        writeln!(f, "{}", &text.trim()).unwrap_or_else(|e| {
+                                            eprintln!("Couldn't appened to seed file: {:?}", e);
+                                        });
+                                    },
+                                    Err(e) => eprintln!("Couldn't open seed file as appened {:?}", e)
+                                }
                             }
                         }
                     }
