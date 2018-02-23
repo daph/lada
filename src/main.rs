@@ -1,9 +1,11 @@
 extern crate lada;
 extern crate slack;
+extern crate regex;
 
 use lada::Brain;
 use slack::{Event, RtmClient};
 use slack::api as slack_api;
+use regex::Regex;
 use std::fs::{File, OpenOptions};
 use std::path::Path;
 use std::process;
@@ -26,21 +28,26 @@ impl slack::EventHandler for LadaClient {
         if let Event::Message(msg) = event {
             match *msg {
                 slack_api::Message::Standard(my_msg) => {
-                    let user = my_msg.user.unwrap_or("".to_owned()).to_lowercase();
-                    let text = my_msg.text.unwrap_or("".to_owned()).to_lowercase();
+                    let user = my_msg.user.unwrap_or("".to_owned());
+                    let text = my_msg.text.unwrap_or("".to_owned());
                     let channel = my_msg.channel.unwrap_or("".to_owned());
 
-                    if user != self.id && text.contains(&self.name) || text.contains(&self.id) {
-                        let clean_id = format!("<@{}>", self.id);
-                        let text = text.replace(&clean_id, "").replace(&self.name, "");
+                    let re_name = Regex::new(&format!("(?i){}", self.name)).unwrap();
+                    let re_id = Regex::new(&format!("(?i){}", self.id)).unwrap();
+
+                    if user != self.id && re_name.is_match(&text) || re_id.is_match(&text) {
                         if text.contains("getget10") {
-                            for _ in 0..10{
+                            for _ in 0..10 {
                                 let _ = cli.sender()
                                     .send_message(&channel, &self.brain.make_sentance(300, ""));
                             }
                         } else {
-                            let _ = cli.sender()
-                                .send_message(&channel, &self.brain.make_sentance(300, &text));
+                            let text = re_name.replace_all(&re_id.replace_all(&text, ""), "")
+                                .split_whitespace()
+                                .collect::<Vec<&str>>()
+                                .join(" ")
+                                .to_owned();
+                            let _ = cli.sender().send_message(&channel, &self.brain.make_sentance(300, &text));
                             for s in get_sentances(&text) {
                                 self.brain.learn(s);
                             }
@@ -73,8 +80,9 @@ impl slack::EventHandler for LadaClient {
     fn on_connect(&mut self, cli: &RtmClient) {
         if let Some(slf) = cli.start_response().slf.as_ref() {
             let slf = slf.clone();
-            self.name = slf.name.expect("No username found in start response!").to_lowercase();
-            self.id = slf.id.expect("No user id found in start response!").to_lowercase();
+            self.name = slf.name.expect("No username found in start response!");
+            self.id = slf.id.expect("No user id found in start response!");
+            self.id = format!("<@{}>", self.id);
         }
     }
 }
