@@ -24,10 +24,13 @@ fn main() {
 
     let mut brain = Brain::new();
 
+    let instant = Instant::now();
     if Path::new(BRAIN_DUMP).exists() {
         brain.load(BRAIN_DUMP);
+        let duration  = instant.elapsed();
+        let elapsed_secs = duration.as_secs() as f64 + duration.subsec_nanos() as f64 * 1e-9;
+        eprintln!("Took {} seconds to load brain dump", elapsed_secs);
     } else {
-        let instant = Instant::now();
         let mut contents = String::new();
         {
             let mut f = File::open(SEED_FILE).expect("File not found");
@@ -40,7 +43,7 @@ fn main() {
 
         let duration  = instant.elapsed();
         let elapsed_secs = duration.as_secs() as f64 + duration.subsec_nanos() as f64 * 1e-9;
-        eprintln!("Took {} seconds to load file and learn", elapsed_secs);
+        eprintln!("Took {} seconds to load seed text and learn", elapsed_secs);
         brain.save(BRAIN_DUMP);
     }
 
