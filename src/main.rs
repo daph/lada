@@ -44,13 +44,7 @@ fn main() {
         brain.save(BRAIN_DUMP);
     }
 
-    let mut client = LadaClient {
-        name: "".to_owned(),
-        id: "".to_owned(),
-        seed_file: SEED_FILE.to_owned(),
-        dump_file: BRAIN_DUMP.to_owned(),
-        brain: brain,
-    };
+    let mut client = LadaClient::new(brain, BRAIN_DUMP, SEED_FILE);
 
     let mut retries = 3;
     loop {

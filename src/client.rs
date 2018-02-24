@@ -8,11 +8,23 @@ use std::io::prelude::*;
 use get_sentances;
 
 pub struct LadaClient {
-    pub name: String,
-    pub id: String,
-    pub dump_file: String,
-    pub seed_file: String,
-    pub brain: Brain,
+    name: String,
+    id: String,
+    dump_file: String,
+    seed_file: String,
+    brain: Brain,
+}
+
+impl LadaClient {
+    pub fn new(brain: Brain, dump_file: &str, seed_file: &str) -> LadaClient {
+        LadaClient {
+            name: "".to_owned(),
+            id: "".to_owned(),
+            dump_file: dump_file.to_owned(),
+            seed_file: seed_file.to_owned(),
+            brain: brain
+        }
+    }
 }
 
 impl EventHandler for LadaClient {
