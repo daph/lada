@@ -10,6 +10,6 @@ Build with cargo, then run it:
 $ git clone https://github.com/daph/lada.git
 $ cd lada
 $ cargo build --release
-$ echo "this is my seed corpus" > corpus.txt
-$ ./target/release/lada <SLACK TOKEN>
+$ echo "this is my seed corpus" > seed.txt
+$ ./target/release/lada --token <SLACK TOKEN>
 ```
