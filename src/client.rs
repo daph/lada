@@ -38,9 +38,10 @@ impl EventHandler for LadaClient {
 
                     let re_name = Regex::new(&format!("(?i){}", self.name)).unwrap();
                     let re_id = Regex::new(&format!("(?i){}", self.id)).unwrap();
+                    let re_gg10 = Regex::new(&format!("(?i){}", "getget10")).unwrap();
 
                     if user != self.id && re_name.is_match(&text) || re_id.is_match(&text) {
-                        if text.contains("getget10") {
+                        if re_gg10.is_match(&text) {
                             for _ in 0..10 {
                                 let _ = cli.sender()
                                     .send_message(&channel, &self.brain.make_sentance(300, ""));
