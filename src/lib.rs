@@ -3,6 +3,7 @@ extern crate rayon;
 extern crate bincode;
 extern crate slack;
 extern crate regex;
+extern crate twox_hash;
 #[macro_use] extern crate serde_derive;
 
 

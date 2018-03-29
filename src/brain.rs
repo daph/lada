@@ -1,5 +1,7 @@
 use std::fmt;
+use std::hash::BuildHasherDefault;
 use std::collections::HashMap;
+use twox_hash::XxHash;
 use std::fs::OpenOptions;
 use rand::{thread_rng};
 use rand::distributions::{Sample, Range};
@@ -8,12 +10,12 @@ use bincode::{serialize_into, deserialize_from};
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct Brain {
-    brain_map: HashMap<(String, String), Vec<String>>
+    brain_map: HashMap<(String, String), Vec<String>, BuildHasherDefault<XxHash>>
 }
 
 impl Brain {
     pub fn new() -> Brain {
-        Brain { brain_map: HashMap::new() }
+        Brain { brain_map: Default::default() }
     }
 
     pub fn learn(&mut self, new_sentance: &str) {
