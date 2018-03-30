@@ -115,10 +115,9 @@ impl Brain {
         let seed = context.split_whitespace().take(2).collect::<Vec<&str>>();
         if seed.len() > 1 {
             let seed_tuple = (seed[0].to_owned(), seed[1].to_owned());
-            if self.brain_map.contains_key(&seed_tuple) {
-                Some(seed_tuple)
-            } else {
-                None
+            match self.brain_map.get(&seed_tuple) {
+                Some(_) => Some(seed_tuple),
+                None => None
             }
         } else {
             None
