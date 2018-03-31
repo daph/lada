@@ -52,7 +52,8 @@ impl EventHandler for LadaClient {
                                 .collect::<Vec<&str>>()
                                 .join(" ")
                                 .to_owned();
-                            let _ = cli.sender().send_message(&channel, &self.brain.make_sentance(300, &text));
+                            let sentance = &self.brain.make_sentance(300, &text);
+                            let _ = cli.sender().send_message(&channel, sentance);
                             for s in get_sentances(&text) {
                                 self.brain.learn(s);
                             }
