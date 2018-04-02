@@ -1,5 +1,4 @@
 extern crate rand;
-extern crate rayon;
 extern crate bincode;
 extern crate slack;
 extern crate regex;

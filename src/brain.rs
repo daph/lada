@@ -5,7 +5,6 @@ use twox_hash::XxHash;
 use std::fs::OpenOptions;
 use rand::{thread_rng};
 use rand::distributions::{Sample, Range};
-use rayon::prelude::*;
 use bincode::{serialize_into, deserialize_from};
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
@@ -102,7 +101,7 @@ impl Brain {
 
     fn get_starts(&self) -> Vec<&(String, String)> {
         self.brain_map
-            .par_iter()
+            .iter()
             .filter_map(|(k, _)| {
                 if k.0 == "<START>" {
                     Some(k)
