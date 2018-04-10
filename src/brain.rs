@@ -3,6 +3,7 @@ use std::hash::BuildHasherDefault;
 use std::collections::HashMap;
 use twox_hash::XxHash;
 use std::fs::OpenOptions;
+use std::io::{BufWriter};
 use rand::{thread_rng};
 use rand::distributions::{Sample, Range};
 use bincode::{serialize_into, deserialize_from};
@@ -82,12 +83,12 @@ impl Brain {
     }
 
     pub fn save(&self, file: &str) {
-        let mut f = OpenOptions::new()
+        let mut f = BufWriter::new(OpenOptions::new()
             .write(true)
             .create(true)
             .truncate(true)
             .open(file)
-            .unwrap();
+            .unwrap());
         serialize_into(&mut f, &self.brain_map).unwrap();
     }
 
