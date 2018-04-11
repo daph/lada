@@ -11,6 +11,7 @@ use std::fs::File;
 use std::path::Path;
 use std::time::{Duration, Instant};
 use std::thread;
+use std::io::BufReader;
 use std::io::prelude::*;
 use clap::{App, Arg};
 
@@ -54,7 +55,7 @@ fn main() {
     } else {
         let mut contents = String::new();
         {
-            let mut f = File::open(seed_file).expect("File not found");
+            let mut f = BufReader::new(File::open(seed_file).expect("File not found"));
             f.read_to_string(&mut contents).expect("Error reading file");
         }
 
