@@ -4,8 +4,8 @@ version = "0.1.0"
 authors = ["David Phillips <david@daviddouglasphillips.com>"]
 
 [dependencies]
-rand = "0.4"
-slack = "0.19.0"
+rand = "0.5"
+slack = "0.22.0"
 bincode = "1.0.0"
 serde = "1.0"
 serde_derive = "1.0"

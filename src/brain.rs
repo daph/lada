@@ -4,8 +4,8 @@ use std::collections::HashMap;
 use twox_hash::XxHash;
 use std::fs::OpenOptions;
 use std::io::{BufWriter, BufReader};
-use rand::{thread_rng};
-use rand::distributions::{Sample, Range};
+use rand::{Rng, thread_rng};
+use rand::distributions::Uniform;
 use bincode::{serialize_into, deserialize_from};
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
@@ -52,8 +52,8 @@ impl Brain {
             }
             None => {
                 let starts = self.get_starts();
-                let mut range = Range::new(0, starts.len());
-                let pick = range.sample(&mut rng);
+                let range = Uniform::new(0, starts.len());
+                let pick = rng.sample(range);
                 let ws = starts[pick].clone();
                 sentance.push_str(&ws.1);
                 ws
@@ -63,8 +63,8 @@ impl Brain {
 
         for _ in 0..max_length {
             if let Some(next) = self.brain_map.get(&word_tuple) {
-                let mut range = Range::new(0, next.len());
-                let pick = range.sample(&mut rng);
+                let range = Uniform::new(0, next.len());
+                let pick = rng.sample(range);
 
                 if next[pick].contains("<STOP>") {
                     break;
