@@ -71,19 +71,14 @@ fn main() {
 
     let mut client = LadaClient::new(brain, brain_dump, seed_file);
 
-    let mut retries = 3;
     loop {
         let r = RtmClient::login_and_run(&api_key, &mut client);
         match r {
             Ok(_) => {},
             Err(err) => {
-                if retries <= 0 {
-                    panic!("No more retries left!")
-                }
                 eprintln!("Slack error: {:?}", err);
-                retries -= 1;
                 thread::sleep(Duration::from_millis(2000));
-                eprintln!("Retrying... (retries left: {})", retries);
+                eprintln!("Retrying...");
             },
         }
     }
