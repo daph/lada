@@ -38,11 +38,22 @@ fn main() {
              .help("The file to dump out the brain for safe keeping")
              .takes_value(true)
              .default_value("brain.dump"))
+        .arg(Arg::with_name("num-sentences")
+             .short("n")
+             .long("num-sentences")
+             .help("Number of sentences to respond with")
+             .takes_value(true)
+             .default_value("1"))
         .get_matches();
 
     let api_key = matches.value_of("token").unwrap();
     let seed_file = matches.value_of("seed-file").unwrap();
     let brain_dump = matches.value_of("brain-dump").unwrap();
+    let num_sentences = matches.value_of("num-sentences")
+        .unwrap()
+        .parse::<usize>()
+        .expect("--num-sentences/-n needs to be an integer");
+
 
     let mut brain = Brain::new();
 
@@ -69,7 +80,7 @@ fn main() {
         brain.save(brain_dump);
     }
 
-    let mut client = LadaClient::new(brain, brain_dump, seed_file);
+    let mut client = LadaClient::new(brain, brain_dump, seed_file, num_sentences);
 
     loop {
         let r = RtmClient::login_and_run(&api_key, &mut client);

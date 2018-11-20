@@ -13,16 +13,18 @@ pub struct LadaClient {
     dump_file: String,
     seed_file: String,
     brain: Brain,
+    sentences: usize,
 }
 
 impl LadaClient {
-    pub fn new(brain: Brain, dump_file: &str, seed_file: &str) -> LadaClient {
+    pub fn new(brain: Brain, dump_file: &str, seed_file: &str, sentences: usize) -> LadaClient {
         LadaClient {
             name: "".to_owned(),
             id: "".to_owned(),
             dump_file: dump_file.to_owned(),
             seed_file: seed_file.to_owned(),
-            brain: brain
+            brain: brain,
+            sentences: sentences
         }
     }
 }
@@ -52,8 +54,13 @@ impl EventHandler for LadaClient {
                                 .collect::<Vec<&str>>()
                                 .join(" ")
                                 .to_owned();
-                            let sentance = &self.brain.make_sentance(300, &text);
-                            let _ = cli.sender().send_message(&channel, sentance);
+                            let mut sentences: Vec<String> = Vec::with_capacity(self.sentences);
+                            sentences.push(self.brain.make_sentance(300, &text));
+                            for _ in 1..self.sentences {
+                                sentences.push(self.brain.make_sentance(300, ""));
+                            }
+                            let sentence = sentences.join(". ");
+                            let _ = cli.sender().send_message(&channel, &sentence);
                             for s in get_sentances(&text) {
                                 self.brain.learn(s);
                             }
