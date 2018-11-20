@@ -46,7 +46,7 @@ impl EventHandler for LadaClient {
                         if re_gg10.is_match(&text) {
                             for _ in 0..10 {
                                 let _ = cli.sender()
-                                    .send_message(&channel, &self.brain.make_sentance(300, ""));
+                                    .send_message(&channel, &self.brain.make_sentence(300, ""));
                             }
                         } else {
                             let text = re_name.replace_all(&re_id.replace_all(&text, ""), "")
@@ -55,9 +55,9 @@ impl EventHandler for LadaClient {
                                 .join(" ")
                                 .to_owned();
                             let mut sentences: Vec<String> = Vec::with_capacity(self.sentences);
-                            sentences.push(self.brain.make_sentance(300, &text));
+                            sentences.push(self.brain.make_sentence(300, &text));
                             for _ in 1..self.sentences {
-                                sentences.push(self.brain.make_sentance(300, ""));
+                                sentences.push(self.brain.make_sentence(300, ""));
                             }
                             let sentence = sentences.join(". ");
                             let _ = cli.sender().send_message(&channel, &sentence);

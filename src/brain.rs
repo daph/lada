@@ -18,11 +18,11 @@ impl Brain {
         Brain { brain_map: Default::default() }
     }
 
-    pub fn learn(&mut self, new_sentance: &str) {
-        let mut sentance = "<START> ".to_owned();
-        sentance.push_str(new_sentance.trim());
-        let w1list = sentance.split_whitespace();
-        let w2list = sentance.split_whitespace().skip(1);
+    pub fn learn(&mut self, new_sentence: &str) {
+        let mut sentence = "<START> ".to_owned();
+        sentence.push_str(new_sentence.trim());
+        let w1list = sentence.split_whitespace();
+        let w2list = sentence.split_whitespace().skip(1);
         let mut tuples = w1list.zip(w2list).peekable();
 
         while let Some((w1, w2)) = tuples.next() {
@@ -40,14 +40,14 @@ impl Brain {
         }
     }
 
-    pub fn make_sentance(&self, max_length: u32, context: &str) -> String {
+    pub fn make_sentence(&self, max_length: u32, context: &str) -> String {
         let mut rng = thread_rng();
-        let mut sentance = String::new();
+        let mut sentence = String::new();
         let mut word_tuple = match self.process_context(context) {
             Some(ws) => {
-                sentance.push_str(&ws.0);
-                sentance.push_str(" ");
-                sentance.push_str(&ws.1);
+                sentence.push_str(&ws.0);
+                sentence.push_str(" ");
+                sentence.push_str(&ws.1);
                 ws
             }
             None => {
@@ -55,7 +55,7 @@ impl Brain {
                 let range = Uniform::new(0, starts.len());
                 let pick = rng.sample(range);
                 let ws = starts[pick].clone();
-                sentance.push_str(&ws.1);
+                sentence.push_str(&ws.1);
                 ws
             }
         };
@@ -69,8 +69,8 @@ impl Brain {
                 if next[pick].contains("<STOP>") {
                     break;
                 }
-                sentance.push_str(" ");
-                sentance.push_str(&next[pick]);
+                sentence.push_str(" ");
+                sentence.push_str(&next[pick]);
 
                 word_tuple = (word_tuple.1, next[pick].to_owned());
             }
@@ -79,7 +79,7 @@ impl Brain {
             }
         }
 
-        sentance
+        sentence
     }
 
     pub fn save(&self, file: &str) {
@@ -127,6 +127,6 @@ impl Brain {
 
 impl fmt::Display for Brain {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.make_sentance(300, ""))
+        write!(f, "{}", self.make_sentence(300, ""))
     }
 }
