@@ -5,7 +5,7 @@ use regex::Regex;
 use std::fs::OpenOptions;
 use std::process;
 use std::io::prelude::*;
-use get_sentances;
+use get_sentences;
 
 pub struct LadaClient {
     name: String,
@@ -61,7 +61,7 @@ impl EventHandler for LadaClient {
                             }
                             let sentence = sentences.join(". ");
                             let _ = cli.sender().send_message(&channel, &sentence);
-                            for s in get_sentances(&text) {
+                            for s in get_sentences(&text) {
                                 self.brain.learn(s);
                             }
                             self.brain.save(&self.dump_file);

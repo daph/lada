@@ -9,12 +9,12 @@ extern crate twox_hash;
 pub mod brain;
 pub mod client;
 
-pub fn get_sentances(contents: &str) -> Vec<&str> {
-    let mut sentances = Vec::new();
+pub fn get_sentences(contents: &str) -> Vec<&str> {
+    let mut sentences = Vec::new();
 
     for s in contents.split_terminator(|t| { t == '.' || t == '?' || t == '!' }) {
-        sentances.push(s.trim());
+        sentences.push(s.trim());
     }
 
-    sentances
+    sentences
 }

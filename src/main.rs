@@ -3,7 +3,7 @@ extern crate slack;
 #[macro_use]
 extern crate clap;
 
-use lada::get_sentances;
+use lada::get_sentences;
 use lada::brain::Brain;
 use lada::client::LadaClient;
 use slack::RtmClient;
@@ -70,7 +70,7 @@ fn main() {
             f.read_to_string(&mut contents).expect("Error reading file");
         }
 
-        for s in get_sentances(&contents) {
+        for s in get_sentences(&contents) {
             brain.learn(s.trim());
         }
 
